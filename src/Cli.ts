@@ -1,13 +1,13 @@
 //Command line interface file. Write inquirer prompts in this file
-const inquirer = require('inquirer');
-const server = require('./server');
-const { pool } = require('./connection');
-const { connectToDb } = require('./connection');
+import inquirer from 'inquirer';
+import * as server from './server.js';
+import { Department, Role, Employee } from './server.js';
 
 
+//Add interfaces for department, role, and employee?
 
-function mainMenu(){
-    inquirer.prompt([
+export async function mainMenu(){
+   const action = await inquirer.prompt([
         { 
             type: 'list',
             name: 'action',
@@ -22,35 +22,36 @@ function mainMenu(){
                 'Update an employee role',
                 'Exit'
             ]
+        },
+    ]); 
+        if (action === `View all departments`){
+            const departments = await server.viewDepartments();
+            console.table(departments);
         }
-    ]) .then(answer => {
-        if (answer.action === `View all departments`){
-             server.viewDepartments();
-        }
-        if (answer.action === `View all roles`){
+        if (action === `View all roles`){
              server.viewRoles();
         }
-        if (answer.action === `View all employees`){
+        if (action === `View all employees`){
              server.viewEmployees();
         }
-        if (answer.action === `Add a department`){
+        if (action === `Add a department`){
             addDepartmentPrompt();
         }
-        if (answer.action === `Add a role`){
+        if (action === `Add a role`){
             addRolePrompt();
         }
-        if (answer.action === `Add an employee`){
+        if (action === `Add an employee`){
             addEmployeePrompt();
         }
-        if (answer.action === `Update an employee role`){
+        if (action === `Update an employee role`){
             updateEmployeeRolePrompt();
         }
-        if (answer.action === `Exit`){
+        if (action === `Exit`){
             console.log('Goodbye!')
             process.exit();
         }
-    });
-}
+    };
+
 
 async function addDepartmentPrompt(){
     const name = await inquirer.prompt([
@@ -75,7 +76,7 @@ async function addDepartmentPrompt(){
 }
 
 async function addRolePrompt(){
-    const departments: any[] = await server.viewDepartments();
+    const departments: Department[] = await server.viewDepartments();
     const departmentChoices = departments.map(department => ({name: department.name, value: department.id}));
     const role = await inquirer.prompt([
         {type: 'input',
@@ -118,11 +119,11 @@ async function addRolePrompt(){
 //Department should be a choice from a list of departments
 
 async function addEmployeePrompt(){
-    const roles: any[] = await server.viewRoles();
+    const roles: Role[] = await server.viewRoles();
     const roleChoices = roles.map(role => ({name: role.title, value: role.id}));
-    const employees: any[] = await server.viewEmployees();
+    const employees: Employee[] = await server.viewEmployees();
     const managerChoices = employees.map(employee => ({name: `${employee.first_name} ${employee.last_name}`, value: employee.id}));
-    const {first_name, last_name, role, manager} = inquirer.prompt([
+    const {first_name, last_name, role, manager} = await inquirer.prompt([
         {
             type: 'input',
             name: 'first_name',
@@ -152,9 +153,9 @@ async function addEmployeePrompt(){
 }
 
 async function updateEmployeeRolePrompt(){
-    const employees: any[] = await server.viewEmployees();
+    const employees: Employee[] = await server.viewEmployees();
     const employeeChoices = employees.map(employee => ({name: `${employee.first_name} ${employee.last_name}`, value: employee.id}));
-    const roles: any[] = await server.viewRoles();
+    const roles: Role[] = await server.viewRoles();
     const roleChoices = roles.map(role => ({name: role.title, value: role.id}));
     const {employeeID, roleID}= await inquirer.prompt([
         {
