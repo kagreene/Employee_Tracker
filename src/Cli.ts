@@ -24,29 +24,38 @@ export async function mainMenu(){
             ]
         },
     ]); 
-        if (action === `View all departments`){
+        if (action.action === `View all departments`){
             const departments = await server.viewDepartments();
             console.table(departments);
+            mainMenu();
         }
-        if (action === `View all roles`){
-             server.viewRoles();
+        if (action.action === `View all roles`){
+             const roles = await server.viewRoles();
+             console.table(roles);
+             mainMenu();
         }
-        if (action === `View all employees`){
-             server.viewEmployees();
+        if (action.action === `View all employees`){
+             const employees = await server.viewEmployees();    
+             console.table(employees);
+             mainMenu();
         }
-        if (action === `Add a department`){
+        if (action.action === `Add a department`){
             addDepartmentPrompt();
+            
         }
-        if (action === `Add a role`){
+        if (action.action === `Add a role`){
             addRolePrompt();
+            
         }
-        if (action === `Add an employee`){
+        if (action.action === `Add an employee`){
             addEmployeePrompt();
+            
         }
-        if (action === `Update an employee role`){
+        if (action.action === `Update an employee role`){
             updateEmployeeRolePrompt();
+            
         }
-        if (action === `Exit`){
+        if (action.action === `Exit`){
             console.log('Goodbye!')
             process.exit();
         }
@@ -60,8 +69,8 @@ async function addDepartmentPrompt(){
         message: 'Enter the name of the department:'
         },
     ]);
-    await server.addDepartment(name);
-    console.log(`Added ${name} to departments`);
+    await server.addDepartment(name.name);
+    console.log(`Added ${name.name} to departments`);
     mainMenu();
 
     // inquirer.prompt([
@@ -157,7 +166,7 @@ async function updateEmployeeRolePrompt(){
     const employeeChoices = employees.map(employee => ({name: `${employee.first_name} ${employee.last_name}`, value: employee.id}));
     const roles: Role[] = await server.viewRoles();
     const roleChoices = roles.map(role => ({name: role.title, value: role.id}));
-    const {employeeID, roleID}= await inquirer.prompt([
+    const {employee, role}= await inquirer.prompt([
         {
             type: 'list',
             name: 'employee',
@@ -173,7 +182,7 @@ async function updateEmployeeRolePrompt(){
             //choose from a list
         }
     ]) 
-    await server.updateEmployeeRole(employeeID, roleID);
-    console.log(`Updated ${employeeID} to ${roleID}`);
+    await server.updateEmployeeRole(employee, role);
+    //console.log(`Updated ${employee} to ${role}`);
     mainMenu();
 }

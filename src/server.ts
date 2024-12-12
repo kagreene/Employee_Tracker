@@ -32,6 +32,7 @@ export interface Employee {
 export async function viewDepartments() {
     const sql = 'SELECT * FROM department';
     try {
+        console.log(`Fetching departments`);
         const result = await pool.query(sql);
         return result.rows;
     } catch (err) {
@@ -101,11 +102,11 @@ export async function addDepartment(name: string) {
 
 };
 
-export async function addRole(role: string, salary: number, department_id: number) {
-    const sql = 'INSERT INTO role (name, salary, department_id) VALUES ($1, $2, $3)';
+export async function addRole(title: string, salary: number, department_id: number) {
+    const sql = 'INSERT INTO role (title, salary, department_id) VALUES ($1, $2, $3)';
     try {
-        await pool.query(sql, [role, salary, department_id])
-        console.log(`Added ${role} to roles`);
+        await pool.query(sql, [title, salary, department_id])
+        console.log(`Added ${title} to roles`);
     } catch (err) {
         console.error('Error adding role:', err);
         throw err;
